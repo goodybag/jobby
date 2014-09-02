@@ -133,6 +133,7 @@ Jobby instances emit various key events per job:
 * __complete__ - emits `job` object upon completing job regardless of success or failure
 * __success__ - emits `job` object upon job completing successfully
 * __fail__ - emits `error` and `job` object upon job failing
+* __retry__ - emits `error` and `job` object when a job has `retryLimit` specified and is retried
 
 
 For example:
