@@ -1,0 +1,20 @@
+{
+  "name": "jobby",
+  "version": "0.0.0",
+  "description": "Easy job scheduling with Postgres",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "postgres",
+    "job",
+    "scheduler",
+    "scheduling"
+  ],
+  "author": "Preston Pham",
+  "license": "MIT",
+  "dependencies": {
+    "pg": "^3.4.1"
+  }
+}
