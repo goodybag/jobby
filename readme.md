@@ -34,7 +34,7 @@ Schedule jobs
 
 ```javascript
 jobby.schedule('email new user', {
-  datetime: '2014-01-13 14:30'
+  when: '2014-01-13 14:30'
 , data: {
     from: 'john@goodybag.com'
   , to: 'bill.gates@microsoft.com'
@@ -98,7 +98,7 @@ Example with all job options:
 
 ```js
 jobby.schedule('welcome user', {
-  datetime: new Date('2014-02-12 14:00') // Date Object or cron string, default `new Date()`
+  when: new Date('2014-02-12 14:00') // Date Object or cron string, default `new Date()`
 , data: {
     to: 'John@goodybag.com'
   , from: 'support@goodybag.com'
@@ -158,7 +158,7 @@ jobby.on('fail:email user', function(error, job) {
 Environment Configuration
 ---
 
-By default, running `jobby.start()` will begin processing all pending
+By default, `jobby.start()` will begin processing all pending
 jobs in the queue. If you want to specify certain types per workers you
 can set up the environment variable `JOB_TYPES`.
 
