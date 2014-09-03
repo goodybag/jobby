@@ -4,9 +4,9 @@ var jobs;
 
 describe('Jobby', function() {
   after(function() {
-    // jobs.query('drop table jobs', function(err){
-    //   if (err) throw err;
-    // });
+    jobs.query('drop table jobs', function(err){
+      if (err) throw err;
+    });
   });
 
   before(function(done){
@@ -22,9 +22,9 @@ describe('Jobby', function() {
 
   beforeEach(function() {
     jobs.definitions = {};
-    // jobs.query('delete from jobs', function(err) {
-    //   if (err) throw err;
-    // });
+    jobs.query('delete from jobs', function(err) {
+      if (err) throw err;
+    });
   });
 
   describe('#define', function() {
@@ -67,9 +67,10 @@ describe('Jobby', function() {
     after(function() {
       jobs.stop();
     });
+
     it('emits start event', function(callback) {
       jobs.define('cat', function(job, done) { done(); });
-      jobs.schedule('cat', {});
+      jobs.schedule('cat');
       jobs.once('start', function(job) {
         assert(job.status === 'in-progress');
         callback();
@@ -78,7 +79,7 @@ describe('Jobby', function() {
 
     it('emits start:type event', function(callback) {
       jobs.define('cat', function(job, done) { done(); });
-      jobs.schedule('cat', {});
+      jobs.schedule('cat');
       jobs.once('start:cat', function(job) {
         assert(job.status === 'in-progress');
         callback();
@@ -103,7 +104,7 @@ describe('Jobby', function() {
 
     it('emits fail event', function(done) {
       jobs.define('bird', function(job, done) { done('woops'); });
-      jobs.schedule('bird', {});
+      jobs.schedule('bird');
       jobs.once('fail', function(err, job) {
         assert(job.status === 'failed');
         done();
@@ -112,7 +113,7 @@ describe('Jobby', function() {
 
     it('emits success event', function(done) {
       jobs.define('bird', function(job, done) { done(); });
-      jobs.schedule('bird', {});
+      jobs.schedule('bird');
       jobs.once('success', function(job) {
         assert(job.status === 'completed');
         done();
@@ -121,7 +122,7 @@ describe('Jobby', function() {
 
     it('emits complete event after success', function(done) {
       jobs.define('bird', function(job, done) { done(); });
-      jobs.schedule('bird', {});
+      jobs.schedule('bird');
       jobs.once('complete', function(job) {
         assert(job.status === 'completed');
         done();
