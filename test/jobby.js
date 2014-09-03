@@ -71,6 +71,7 @@ describe('Jobby', function() {
       jobs.define('cat', function(job, done) { done(); });
       jobs.schedule('cat', {});
       jobs.once('start', function(job) {
+        assert(job.status === 'in-progress');
         callback();
       });
     });
@@ -79,6 +80,7 @@ describe('Jobby', function() {
       jobs.define('cat', function(job, done) { done(); });
       jobs.schedule('cat', {});
       jobs.once('start:cat', function(job) {
+        assert(job.status === 'in-progress');
         callback();
       });
     });
@@ -86,7 +88,7 @@ describe('Jobby', function() {
     it('emits retry event', function(callback) {
       jobs.define('dog', function(job, done) { done(new Error('woof')); });
       jobs.schedule('dog', {retryLimit: 2});
-      jobs.once('retry', function(job) {
+      jobs.once('retry', function(err, job) {
         callback();
       });
     });
@@ -94,7 +96,7 @@ describe('Jobby', function() {
     it('emits retry:type event', function(done) {
       jobs.define('dog', function(job, done) { done(new Error('woof')); });
       jobs.schedule('dog', {retryLimit: 2});
-      jobs.once('retry:dog', function(job) {
+      jobs.once('retry:dog', function(err, job) {
         done();
       });
     });
@@ -102,7 +104,8 @@ describe('Jobby', function() {
     it('emits fail event', function(done) {
       jobs.define('bird', function(job, done) { done('woops'); });
       jobs.schedule('bird', {});
-      jobs.once('fail', function(job) {
+      jobs.once('fail', function(err, job) {
+        assert(job.status === 'failed');
         done();
       });
     });
@@ -111,6 +114,7 @@ describe('Jobby', function() {
       jobs.define('bird', function(job, done) { done(); });
       jobs.schedule('bird', {});
       jobs.once('success', function(job) {
+        assert(job.status === 'completed');
         done();
       });
     });
@@ -119,6 +123,7 @@ describe('Jobby', function() {
       jobs.define('bird', function(job, done) { done(); });
       jobs.schedule('bird', {});
       jobs.once('complete', function(job) {
+        assert(job.status === 'completed');
         done();
       });
     });
