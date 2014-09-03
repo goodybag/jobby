@@ -2,17 +2,17 @@ var assert = require('assert');
 var Jobby = require('../');
 var jobs;
 
-describe('jobs', function() {
+describe('Jobby', function() {
   after(function() {
-    jobs.query('drop table jobs', function(err){
-      if (err) throw err;
-    });
+    // jobs.query('drop table jobs', function(err){
+    //   if (err) throw err;
+    // });
   });
 
   before(function(done){
     jobs = new Jobby({
       conString: 'postgres://localhost/scheduled_jobs_test',
-      processInterval: 100
+      processInterval: 10
     });
 
     jobs.on('setup:complete', function() {
@@ -22,6 +22,9 @@ describe('jobs', function() {
 
   beforeEach(function() {
     jobs.definitions = {};
+    // jobs.query('delete from jobs', function(err) {
+    //   if (err) throw err;
+    // });
   });
 
   describe('#define', function() {
@@ -56,35 +59,68 @@ describe('jobs', function() {
     });
   });
 
-  describe('events', function() {
+  describe('#events', function() {
+    before(function() {
+      jobs.start();
+    });
+
+    after(function() {
+      jobs.stop();
+    });
     it('emits start event', function(callback) {
       jobs.define('cat', function(job, done) { done(); });
-      jobs.schedule('cat', {}, function() {});
-      jobs.start();
-      jobs.on('start', function(job) {
-        jobs.stop();
+      jobs.schedule('cat', {});
+      jobs.once('start', function(job) {
         callback();
       });
     });
 
-    it('emits retry event', function(done) {
-      assert(false);
-      done();
+    it('emits start:type event', function(callback) {
+      jobs.define('cat', function(job, done) { done(); });
+      jobs.schedule('cat', {});
+      jobs.once('start:cat', function(job) {
+        callback();
+      });
+    });
+
+    it('emits retry event', function(callback) {
+      jobs.define('dog', function(job, done) { done(new Error('woof')); });
+      jobs.schedule('dog', {retryLimit: 2});
+      jobs.once('retry', function(job) {
+        callback();
+      });
+    });
+
+    it('emits retry:type event', function(done) {
+      jobs.define('dog', function(job, done) { done(new Error('woof')); });
+      jobs.schedule('dog', {retryLimit: 2});
+      jobs.once('retry:dog', function(job) {
+        done();
+      });
     });
 
     it('emits fail event', function(done) {
-      assert(false);
-      done();
+      jobs.define('bird', function(job, done) { done('woops'); });
+      jobs.schedule('bird', {});
+      jobs.once('fail', function(job) {
+        done();
+      });
     });
 
     it('emits success event', function(done) {
-      assert(false);
-      done();
+      jobs.define('bird', function(job, done) { done(); });
+      jobs.schedule('bird', {});
+      jobs.once('success', function(job) {
+        done();
+      });
     });
 
-    it('emits complete event', function(done) {
-      assert(false);
-      done();
+    it('emits complete event after success', function(done) {
+      jobs.define('bird', function(job, done) { done(); });
+      jobs.schedule('bird', {});
+      jobs.once('complete', function(job) {
+        done();
+      });
     });
   });
 });
