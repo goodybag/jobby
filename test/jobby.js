@@ -3,9 +3,10 @@ var Jobby = require('../');
 var jobs;
 
 describe('Jobby', function() {
-  after(function() {
-    jobs.query('drop table jobs', function(err){
+  after(function(done) {
+    jobs.db.query('drop table jobs', function(err){
       if (err) throw err;
+      done();
     });
   });
 
@@ -14,17 +15,12 @@ describe('Jobby', function() {
       conString: 'postgres://localhost/scheduled_jobs_test',
       processInterval: 10
     });
-
-    jobs.on('setup:complete', function() {
-      done();
-    });
+    jobs.on('setup:complete', done);
   });
 
-  beforeEach(function() {
+  beforeEach(function(done) {
     jobs.definitions = {};
-    jobs.query('delete from jobs', function(err) {
-      if (err) throw err;
-    });
+    jobs.db.query('delete from jobs', done);
   });
 
   describe('#define', function() {
